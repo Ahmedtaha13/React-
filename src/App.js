@@ -1,59 +1,52 @@
-import React, { Component } from 'react';
-
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      person: {
-        fullName: 'John Doe',
-        bio: 'Software Engineer',
-        imgSrc: 'https://example.com/image.jpg',
-        profession: 'Software Engineer'
-      },
-      shows: false,
-      lastMounted: null
-    };
-    this.toggleProfile = this.toggleProfile.bind(this);
-  }
-
-  componentDidMount() {
-    this.intervalId = setInterval(() => {
-      this.setState({ lastMounted: new Date() });
-    }, 1000);
-  }
-
-  componentDidUpdate() {
-    clearInterval(this.intervalId);
-    this.intervalId = setInterval(() => {
-      this.setState({ lastMounted: new Date() });
-    }, 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.intervalId);
-  }
-
-  toggleProfile() {
-    this.setState(prevState => ({ shows: !prevState.shows }));
-  }
-
-  render() {
-    return (
-      <div>
-        <h1>Hello, World!</h1>
-        <button onClick={this.toggleProfile}>Toggle Profile</button>
-        {this.state.shows && (
-          <div>
-            <h2>{this.state.person.fullName}</h2>
-            <img src={this.state.person.imgSrc} alt={this.state.person.fullName} />
-            <p>{this.state.person.bio}</p>
-            <p>{this.state.person.profession}</p>
-          </div>
-        )}
-        <p>Last mounted: {this.state.lastMounted ? this.state.lastMounted.toLocaleTimeString() : 'Never'}</p>
-      </div>
-    );
-  }
+class Task {
+    constructor(id, description, isDone = false) {
+        this.id = id;
+        this.description = description;
+        this.isDone = isDone;
+    }
 }
 
-export default App;
+class TaskManager {
+    constructor() {
+        this.tasks = [];
+    }
+
+    addTask(description) {
+        const taskId = this.tasks.length + 1;
+        const task = new Task(taskId, description);
+        this.tasks.push(task);
+    }
+
+    listTasks(filter = null) {
+        if (filter === null) {
+            return this.tasks;
+        } else {
+            return this.tasks.filter(task => task.isDone === filter);
+        }
+    }
+
+    editTask(taskId, newDescription) {
+        const task = this.tasks.find(task => task.id === taskId);
+        if (task) {
+            task.description = newDescription;
+            return true;
+        }
+        return false;
+    }
+}
+
+// Example usage:
+const taskManager = new TaskManager();
+
+// Add tasks
+taskManager.addTask("Complete homework");
+taskManager.addTask("Go for a run");
+
+// List all tasks
+console.log("All tasks:");
+taskManager.listTasks().forEach(task => console.log(task));
+
+// Edit a task
+taskManager.editTask(1, "Complete assignment");
+console.log("\nAfter editing:");
+taskManager.listTasks().forEach(task => console.log(task));
